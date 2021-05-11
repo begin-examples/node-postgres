@@ -1,5 +1,5 @@
 name: PostgreSQL Service Example
-on: 
+on:
   push:
   workflow_dispatch:
 
@@ -45,7 +45,7 @@ jobs:
         run: npm i tape tap-spec tiny-json-http @architect/sandbox
 
       - name: Seed Postgres
-        run: node seed_db.js
+        run: node .github/workflows/seed_db.js
         env:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
