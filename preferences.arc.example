@@ -1,0 +1,12 @@
+@sandbox-startup
+docker-compose -f ./scripts/docker-compose.yml up -d postgres 
+echo 'database started' 
+
+# The @env pragma is synced (and overwritten) by running arc env
+@env
+testing
+  POSTGRES_DATABASE postgres
+  POSTGRES_HOST localhost
+  POSTGRES_PASSWORD postgres
+  POSTGRES_PORT "5432"
+  POSTGRES_USER postgres
