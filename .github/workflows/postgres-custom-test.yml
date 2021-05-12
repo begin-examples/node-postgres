@@ -1,23 +1,18 @@
-name: PostgreSQL Service Example
+name: PostgreSQL Tests
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  # Label of the runner job
-  runner-job:
-    # You must use a Linux environment when using service containers or container jobs
+  postgres-tests:
     runs-on: ubuntu-latest
 
-    # Service containers to run with `runner-job`
     services:
-      # Label used to access the service container
       postgres:
-        # Docker Hub image
         image: postgres
-        # Provide the password for postgres
         env:
           POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -27,14 +22,13 @@ jobs:
         ports:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
+        volumes:
+          - .github/workflows/seed_database.sql:/docker-entrypoint-initdb.d/init.sql
 
     steps:
-      # Downloads a copy of the code in your repository before running CI tests
       - name: Check out repository code
         uses: actions/checkout@v2
 
-      # Performs a clean installation of all dependencies in the `package.json` file
-      # For more information, see https://docs.npmjs.com/cli/ci.html
       - name: Install dependencies
         run: npm install
 
@@ -44,8 +38,8 @@ jobs:
       - name: Install Test Dependencies
         run: npm i tape tap-spec tiny-json-http @architect/sandbox
 
-      - name: Seed Postgres
-        run: node .github/workflows/seed_db.js
+      - name: Run Sandbox Tests
+        run: QUIET=1 npx tape .github/workflows/postgres-custom-test.js | npx tap-spec
         env:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
@@ -53,11 +47,20 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DATABASE: postgres
 
-      - name: Run Sandbox Tests
-        run: QUIET=1 npx tape .github/workflows/postgres-sandbox-test.js | npx tap-spec
-        env:
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DATABASE: postgres
+      - uses: apogiatzis/ngrok-tunneling-action@v0.1.4
+        with:
+          timeout: 1m
+          port: 5432
+          ngrok_authtoken: ${{ secrets.NGROK_AUTHTOKEN }}
+
+      - run: curl http://localhost:4040/api/tunnels
+
+      - name: Notify
+        uses: homoluctus/slatify@master
+        if: github.ref == 'refs/heads/main' && failure()
+        with:
+          type: ${{ job.status }}
+          job_name: "*postgres custom test*"
+          url: ${{ secrets.BX_SLACK_WEBHOOK }}
+          commit: true
+          token: ${{ secrets.GITHUB_TOKEN }}

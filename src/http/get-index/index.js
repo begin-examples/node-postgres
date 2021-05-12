@@ -5,9 +5,8 @@ let config = {
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.POSTGRES_DATABASE,
     port: process.env.POSTGRES_PORT,
-    // ssl: {
-    //     rejectUnauthorized: false,
-    // },
+  // ssl property below may be needed for development with some postgres providers like Heroku
+  //  ssl: { rejectUnauthorized: false },
 };
 
 exports.handler = async function http(req) {
