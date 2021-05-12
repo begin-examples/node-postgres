@@ -57,14 +57,6 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DATABASE: postgres
 
-      - uses: apogiatzis/ngrok-tunneling-action@v0.1.4
-        with:
-          timeout: 1m
-          port: 5432
-          ngrok_authtoken: ${{ secrets.NGROK_AUTHTOKEN }}
-
-      - run: curl http://localhost:4040/api/tunnels
-
       - name: Notify
         uses: homoluctus/slatify@master
         if: github.ref == 'refs/heads/main' && failure()
