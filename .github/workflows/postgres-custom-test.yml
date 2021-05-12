@@ -22,9 +22,9 @@ jobs:
         ports:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
-        volumes:
-          - "scripts/seed-database.sql:/docker-entrypoint-initdb.d/init.sql"
-          #- ".github/workflows/seed-database.sql:/docker-entrypoint-initdb.d/init.sql"
+        # volumes:
+        #   - "scripts/seed-database.sql:/docker-entrypoint-initdb.d/init.sql"
+        #   #- ".github/workflows/seed-database.sql:/docker-entrypoint-initdb.d/init.sql"
 
     steps:
       - name: Check out repository code
@@ -38,6 +38,15 @@ jobs:
 
       - name: Install Test Dependencies
         run: npm i tape tap-spec tiny-json-http @architect/sandbox
+
+      - name: Seed Postgres
+        run: node .github/workflows/seed-db.js
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DATABASE: postgres
 
       - name: Run Sandbox Tests
         run: QUIET=1 npx tape .github/workflows/postgres-custom-test.js | npx tap-spec
