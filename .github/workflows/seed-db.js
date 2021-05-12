@@ -23,9 +23,9 @@ pgclient.query(table, (err, res) => {
 });
 pgclient.query(text, values, (err, res) => {
     if (err) throw err;
+    pgclient.end();
 });
 
-pgclient.end();
 
 
 // pgclient.query("SELECT * FROM student", (err, res) => {
