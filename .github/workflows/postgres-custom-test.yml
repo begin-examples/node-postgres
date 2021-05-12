@@ -23,7 +23,7 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
         volumes:
-          - .github/workflows/seed_database.sql:/docker-entrypoint-initdb.d/init.sql
+          - .github/workflows/seed-database.sql:/docker-entrypoint-initdb.d/init.sql
 
     steps:
       - name: Check out repository code
