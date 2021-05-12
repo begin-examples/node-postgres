@@ -17,7 +17,6 @@ test('Request to Root', async (t) => {
   t.plan(1)
   try {
     const result = await tiny.get({ url: baseUrl })
-    console.log(result)
     t.ok(result.body.search('Octocat')!==-1, 'request to root responded')
   }
   catch (e) {
