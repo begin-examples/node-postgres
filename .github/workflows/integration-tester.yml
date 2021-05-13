@@ -113,7 +113,7 @@ jobs:
 
     steps:
       - name: Check out repo
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Set up Node.js
         uses: actions/setup-node@v1
@@ -129,6 +129,13 @@ jobs:
           VER=`node --version`; echo "Node ver:   $VER"
           VER=`npm --version`; echo "npm ver:    $VER"
 
+      - name: Configure AWS credentials from Test account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.BX_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.BX_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
       - name: Install
         run: npm install
 
@@ -138,28 +145,40 @@ jobs:
       - name: Install Test Dependencies
         run: npm i tape tap-spec tiny-json-http
 
-      - name: Deploy Staging
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.BX_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.BX_AWS_SECRET_ACCESS_KEY }}
-        run: npx arc deploy --name bx-${GITHUB_SHA::7}-$(date +%d) | tee deploy_output.txt
+      - name: Set Stack Name
+        run: echo "UNIQUE_STACK=$(echo 'b${GITHUB_SHA}$(date +%d)')" >> $GITHUB_ENV
 
-      - name: Find Staging url
-        # TODO: Code review on the RegEx to make sure this is not too fragile
-        run: echo "staging_url=$(cat deploy_output.txt | sed -E -n 's@\s*(https:\/\/[a-zA-Z0-9]+\.execute-api\.[a-zA-Z0-9-]+\.amazonaws\.com)@\1@p')" >> $GITHUB_ENV
+      - name: Deploy Staging
+        # env:
+        #   AWS_ACCESS_KEY_ID: ${{ secrets.BX_AWS_ACCESS_KEY_ID }}
+        #   AWS_SECRET_ACCESS_KEY: ${{ secrets.BX_AWS_SECRET_ACCESS_KEY }}
+        run: npx arc deploy --name ${{env.UNIQUE_STACK}} | tee deploy_output.txt
 
       - name: Find App Name
-        # TODO: Code review on the RegEx to make sure this is not too fragile
-        run: echo "app_name=$(cat deploy_output.txt | sed -E -n 's@\s*App ⌁ ([a-zA-Z0-9-]+)\s*@\1@p')" >> $GITHUB_ENV
+        run: echo "APP_NAME=$(node scripts/get-app-name.js -i sam.json)" >> $GITHUB_ENV
+
+      - name: Calculate Stack Name
+        run: echo "AWS_STACK_NAME=$(node scripts/get-stack-name.js --app-name ${{env.APP_NAME}} --unique-stack ${{UNIQUE_STACK}})" >> $GITHUB_ENV
+
+      - name: Find Stack Url
+        run: echo "STAGING_URL=$(aws cloudformation describe-stacks --stack-name ${{env.AWS_STACK_NAME}} --region us-west-2 | node get-staging-url.js)" >> $GITHUB_ENV
+
+      # - name: Find Staging url
+      #   # TODO: Code review on the RegEx to make sure this is not too fragile
+      #   run: echo "staging_url=$(cat deploy_output.txt | sed -E -n 's@\s*(https:\/\/[a-zA-Z0-9]+\.execute-api\.[a-zA-Z0-9-]+\.amazonaws\.com)@\1@p')" >> $GITHUB_ENV
+
+      # - name: Find App Name
+      #   # TODO: Code review on the RegEx to make sure this is not too fragile
+      #   run: echo "app_name=$(cat deploy_output.txt | sed -E -n 's@\s*App ⌁ ([a-zA-Z0-9-]+)\s*@\1@p')" >> $GITHUB_ENV
 
       - name: Run Staging Tests
         run: QUIET=1 STAGING_URL=${{ env.staging_url }} npx tape .github/workflows/integration-tests/**/**staging-test.js | npx tap-spec
 
       - name: Destroy Infrastructure
         if: ${{ always() }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        # env:
+        #   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        #   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: npx arc destroy --app ${{ env.app_name }} --name bx-${GITHUB_SHA::7}-$(date +%d) --force --now
 
       - name: Notify
