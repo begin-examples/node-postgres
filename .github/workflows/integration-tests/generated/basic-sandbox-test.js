@@ -1,1 +1,1 @@
-// This file is a placeholder for the integration tester
+// this file is a placeholder for the integration tests.
