@@ -24,7 +24,7 @@ jobs:
 
         #fails if no custom tests present
       - name: check for custom tests if no sync tests added
-        if: ${{fromJson(env.TEST_CONFIG).run==='none'}}
+        if: ${{fromJson(env.TEST_CONFIG).run=='none'}}
         run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js  ||  exit 1
 
       - name: Notify
@@ -52,7 +52,7 @@ jobs:
 
         #fails if no custom tests present
       - name: check for custom tests if no sync tests added
-        if: ${{fromJson(env.TEST_CONFIG).run==='none'}}
+        if: ${{fromJson(env.TEST_CONFIG).run=='none'}}
         run: test -f .github/workflows/integration-tests/custom/**staging-test.js  ||  exit 1
 
       - name: Notify
@@ -111,7 +111,7 @@ jobs:
 
         #fails if no custom tests present
       - name: Run Basic Tests
-        if: ${{fromJson(env.TEST_CONFIG).run==='basic'}}
+        if: ${{fromJson(env.TEST_CONFIG).run=='basic'}}
         run: QUIET=1 npx tape .github/workflows/integration-tests/generated/**sandbox-test.js | npx tap-spec
 
       - name: Notify
@@ -192,7 +192,7 @@ jobs:
         run: echo "TEST_CONFIG=$(cat .github/workflows/integration-tests/generated/tests-config.json)" >> $GITHUB_ENV
 
       - name: Run Basic Tests
-        if: ${{fromJson(env.TEST_CONFIG).run==='basic'}}
+        if: ${{fromJson(env.TEST_CONFIG).run=='basic'}}
         run: QUIET=1 STAGING_URL=${{ env.STAGING_URL }} npx tape .github/workflows/integration-tests/generated/**staging-test.js | npx tap-spec
 
       - name: Run Custom Staging Tests
