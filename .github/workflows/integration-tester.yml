@@ -189,10 +189,12 @@ jobs:
         run: echo "STAGING_URL=$(aws cloudformation describe-stacks --stack-name ${{env.AWS_STACK_NAME}} | node .github/workflows/integration-tests/scripts/get-staging-url.js)" >> $GITHUB_ENV
 
       - name: Read Test Config
-        run: echo "TEST_CONFIG=$(cat .github/workflows/integration-tests/generated/tests-config.json)" >> $GITHUB_ENV
+        run: |
+          JSON=$(cat .github/workflows/integration-tests/generated/tests-config.json)
+          echo "TEST_CONFIG_RUN=${{fromJson($JSON).run}}" >> $GITHUB_ENV
 
       - name: Run Basic Tests
-        if: ${{fromJson(env.TEST_CONFIG).run=='basic'}}
+        if: ${{env.TEST_CONFIG_RUN=='basic'}}
         run: QUIET=1 STAGING_URL=${{ env.STAGING_URL }} npx tape .github/workflows/integration-tests/generated/**staging-test.js | npx tap-spec
 
       - name: Run Custom Staging Tests
