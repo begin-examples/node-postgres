@@ -17,7 +17,7 @@ jobs:
         node-version: [12.x]
     steps:
       - name: Check out repo
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
         #fails if no tests present
       - name: check for tests
@@ -41,7 +41,7 @@ jobs:
         node-version: [12.x]
     steps:
       - name: Check out repo
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
         #fails if no tests present
       - name: check for tests
@@ -68,7 +68,7 @@ jobs:
     # Go
     steps:
       - name: Check out repo
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Set up Node.js
         uses: actions/setup-node@v1
@@ -162,14 +162,6 @@ jobs:
 
       - name: Find Stack Url
         run: echo "STAGING_URL=$(aws cloudformation describe-stacks --stack-name ${{env.AWS_STACK_NAME}} | node .github/workflows/integration-tests/scripts/get-staging-url.js)" >> $GITHUB_ENV
-
-      # - name: Find Staging url
-      #   # TODO: Code review on the RegEx to make sure this is not too fragile
-      #   run: echo "staging_url=$(cat deploy_output.txt | sed -E -n 's@\s*(https:\/\/[a-zA-Z0-9]+\.execute-api\.[a-zA-Z0-9-]+\.amazonaws\.com)@\1@p')" >> $GITHUB_ENV
-
-      # - name: Find App Name
-      #   # TODO: Code review on the RegEx to make sure this is not too fragile
-      #   run: echo "app_name=$(cat deploy_output.txt | sed -E -n 's@\s*App ⌁ ([a-zA-Z0-9-]+)\s*@\1@p')" >> $GITHUB_ENV
 
       - name: Run Staging Tests
         run: QUIET=1 STAGING_URL=${{ env.STAGING_URL }} npx tape .github/workflows/integration-tests/**/**staging-test.js | npx tap-spec
