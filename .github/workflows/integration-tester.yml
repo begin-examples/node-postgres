@@ -19,9 +19,13 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v2
 
-        #fails if no tests present
-      - name: check for tests
-        run: test -f .github/workflows/integration-tests/**/**sandbox-test.js  ||  exit 1
+      - name: Read Test Config
+        run: echo "TEST_CONFIG=$(cat .github/workflows/integration-tests/generated/tests-config.json)" >> $GITHUB_ENV
+
+        #fails if no custom tests present
+      - name: check for custom tests if no sync tests added
+        if: ${{fromJSON(env.TEST_CONFIG).run==='none'}}
+        run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js  ||  exit 1
 
       - name: Notify
         uses: homoluctus/slatify@master
@@ -43,9 +47,13 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v2
 
-        #fails if no tests present
-      - name: check for tests
-        run: test -f .github/workflows/integration-tests/**/**staging-test.js  ||  exit 1
+      - name: Read Test Config
+        run: echo "TEST_CONFIG=$(cat .github/workflows/integration-tests/generated/tests-config.json)" >> $GITHUB_ENV
+
+        #fails if no custom tests present
+      - name: check for custom tests if no sync tests added
+        if: ${{fromJSON(env.TEST_CONFIG).run==='none'}}
+        run: test -f .github/workflows/integration-tests/custom/**staging-test.js  ||  exit 1
 
       - name: Notify
         uses: homoluctus/slatify@master
@@ -86,11 +94,25 @@ jobs:
       - name: Install
         run: npm install
 
-      - name: Install Test Dependencies
-        run: npm i tape tap-spec tiny-json-http @architect/sandbox
+      - name: Install Architect
+        run: npm i @architect/architect
 
-      - name: Run Sandbox Tests
-        run: QUIET=1 npx tape .github/workflows/integration-tests/**/**sandbox-test.js | npx tap-spec
+      - name: Install Test Dependencies
+        run: npm i tape tap-spec tiny-json-http
+
+      - name: Build if needed
+        run: npm run build --if-present
+
+      - name: Read Test Config
+        run: echo "TEST_CONFIG=$(cat .github/workflows/integration-tests/generated/tests-config.json)" >> $GITHUB_ENV
+
+      - name: Run Custom Sandbox Tests
+        run: QUIET=1 npx tape .github/workflows/integration-tests/custom/**sandbox-test.js | npx tap-spec
+
+        #fails if no custom tests present
+      - name: Run Basic Tests
+        if: ${{fromJSON(env.TEST_CONFIG).run==='basic'}}
+        run: QUIET=1 npx tape .github/workflows/integration-tests/generated/**sandbox-test.js | npx tap-spec
 
       - name: Notify
         uses: homoluctus/slatify@master
@@ -142,6 +164,9 @@ jobs:
       - name: Install Architect
         run: npm i @architect/architect
 
+      - name: Build if needed
+        run: npm run build --if-present
+
       - name: Install Test Dependencies
         run: npm i tape tap-spec tiny-json-http
 
@@ -163,8 +188,15 @@ jobs:
       - name: Find Stack Url
         run: echo "STAGING_URL=$(aws cloudformation describe-stacks --stack-name ${{env.AWS_STACK_NAME}} | node .github/workflows/integration-tests/scripts/get-staging-url.js)" >> $GITHUB_ENV
 
-      - name: Run Staging Tests
-        run: QUIET=1 STAGING_URL=${{ env.STAGING_URL }} npx tape .github/workflows/integration-tests/**/**staging-test.js | npx tap-spec
+      - name: Read Test Config
+        run: echo "TEST_CONFIG=$(cat .github/workflows/integration-tests/generated/tests-config.json)" >> $GITHUB_ENV
+
+      - name: Run Basic Tests
+        if: ${{fromJSON(env.TEST_CONFIG).run==='basic'}}
+        run: QUIET=1 STAGING_URL=${{ env.STAGING_URL }} npx tape .github/workflows/integration-tests/generated/**staging-test.js | npx tap-spec
+
+      - name: Run Custom Staging Tests
+        run: QUIET=1 STAGING_URL=${{ env.STAGING_URL }} npx tape .github/workflows/integration-tests/custom/**staging-test.js | npx tap-spec
 
       - name: Destroy Infrastructure
         if: ${{ always() }}
