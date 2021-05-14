@@ -145,6 +145,9 @@ jobs:
       - name: Install Test Dependencies
         run: npm i tape tap-spec tiny-json-http
 
+      - name: Install Script Dependencies
+        run: npm i yargs
+
       - name: Set Stack Name
         run: echo "UNIQUE_STACK=b${GITHUB_SHA::7}$(date +%d)" >> $GITHUB_ENV
 
