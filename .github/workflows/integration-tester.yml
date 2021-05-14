@@ -191,7 +191,7 @@ jobs:
       - name: Read Test Config
         run: |
           JSON=$(cat .github/workflows/integration-tests/generated/tests-config.json)
-          echo "TEST_CONFIG_RUN=${{fromJson($JSON).run}}" >> $GITHUB_ENV
+          echo "TEST_CONFIG_RUN=${{fromJson(JSON).run}}" >> $GITHUB_ENV
 
       - name: Run Basic Tests
         if: ${{env.TEST_CONFIG_RUN=='basic'}}
