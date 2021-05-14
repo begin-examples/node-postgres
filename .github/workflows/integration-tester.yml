@@ -105,7 +105,7 @@ jobs:
   staging_tests:
     #Setup
     runs-on: ubuntu-latest
-    needs: [staging_tests_exist, staging_tests]
+    needs: [staging_tests_exist, sandbox_tests]
 
     strategy:
       matrix:
