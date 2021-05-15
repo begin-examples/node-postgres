@@ -20,11 +20,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Read Test Config
-        run: echo "TEST_CONFIG=$(cat .github/workflows/integration-tests/generated/tests-config.json)" >> $GITHUB_ENV
+        run: echo "TEST_CONFIG_RUN=$(cat .github/workflows/integration-tests/generated/tests-config.json | jq '.run')" >> $GITHUB_ENV
 
         #fails if no custom tests present
       - name: check for custom tests if no sync tests added
-        if: ${{fromJson(env.TEST_CONFIG).run=='none'}}
+        if: ${{env.TEST_CONFIG_RUN=='none'}}
         run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js  ||  exit 1
 
       - name: Notify
@@ -48,11 +48,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Read Test Config
-        run: echo "TEST_CONFIG=$(cat .github/workflows/integration-tests/generated/tests-config.json)" >> $GITHUB_ENV
+        run: echo "TEST_CONFIG_RUN=$(cat .github/workflows/integration-tests/generated/tests-config.json | jq '.run')" >> $GITHUB_ENV
 
         #fails if no custom tests present
       - name: check for custom tests if no sync tests added
-        if: ${{fromJson(env.TEST_CONFIG).run=='none'}}
+        if: ${{env.TEST_CONFIG_RUN=='none'}}
         run: test -f .github/workflows/integration-tests/custom/**staging-test.js  ||  exit 1
 
       - name: Notify
@@ -104,14 +104,14 @@ jobs:
         run: npm run build --if-present
 
       - name: Read Test Config
-        run: echo "TEST_CONFIG=$(cat .github/workflows/integration-tests/generated/tests-config.json)" >> $GITHUB_ENV
+        run: echo "TEST_CONFIG_RUN=$(cat .github/workflows/integration-tests/generated/tests-config.json | jq '.run')" >> $GITHUB_ENV
 
       - name: Run Custom Sandbox Tests
         run: QUIET=1 npx tape .github/workflows/integration-tests/custom/**sandbox-test.js | npx tap-spec
 
         #fails if no custom tests present
       - name: Run Basic Tests
-        if: ${{fromJson(env.TEST_CONFIG).run=='basic'}}
+        if: ${{env.TEST_CONFIG_RUN=='basic'}}
         run: QUIET=1 npx tape .github/workflows/integration-tests/generated/**sandbox-test.js | npx tap-spec
 
       - name: Notify
@@ -189,9 +189,7 @@ jobs:
         run: echo "STAGING_URL=$(aws cloudformation describe-stacks --stack-name ${{env.AWS_STACK_NAME}} | node .github/workflows/integration-tests/scripts/get-staging-url.js)" >> $GITHUB_ENV
 
       - name: Read Test Config
-        run: |
-          JSON=$(cat .github/workflows/integration-tests/generated/tests-config.json)
-          echo "TEST_CONFIG_RUN=${{fromJson(env.JSON).run}}" >> $GITHUB_ENV
+        run: echo "TEST_CONFIG_RUN=$(cat .github/workflows/integration-tests/generated/tests-config.json | jq '.run')" >> $GITHUB_ENV
 
       - name: Run Basic Tests
         if: ${{env.TEST_CONFIG_RUN=='basic'}}
