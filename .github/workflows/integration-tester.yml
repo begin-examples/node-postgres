@@ -107,10 +107,10 @@ jobs:
         run: echo "TEST_CONFIG_RUN=$(cat .github/workflows/integration-tests/generated/tests-config.json | jq '.run')" >> $GITHUB_ENV
 
       - name: Check for custom tests
-        run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js || echo "CUSTOM_TESTS='false'" >> $GITHUB_ENV
+        run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js || echo "NO_CUSTOM_TESTS=true" >> $GITHUB_ENV
 
       - name: Run Custom Sandbox Tests
-        if: ${{env.CUSTOM_TESTS!='false'}}
+        if: ${{env.NO_CUSTOM_TESTS}}
         run: QUIET=1 npx tape .github/workflows/integration-tests/custom/**sandbox-test.js | npx tap-spec
 
         #fails if no custom tests present
@@ -200,10 +200,10 @@ jobs:
         run: QUIET=1 STAGING_URL=${{ env.STAGING_URL }} npx tape .github/workflows/integration-tests/generated/**staging-test.js | npx tap-spec
 
       - name: Check for custom tests
-        run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js || echo "CUSTOM_TESTS='false'" >> $GITHUB_ENV
+        run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js || echo "NO_CUSTOM_TESTS=true" >> $GITHUB_ENV
 
       - name: Run Custom Staging Tests
-        if: ${{env.CUSTOM_TESTS!='false'}}
+        if: ${{env.NO_CUSTOM_TESTS}}
         run: QUIET=1 STAGING_URL=${{ env.STAGING_URL }} npx tape .github/workflows/integration-tests/custom/**staging-test.js | npx tap-spec
 
       - name: Destroy Infrastructure
