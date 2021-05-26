@@ -1,0 +1,24 @@
+{
+  "name": "begin-postgres",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/begin-examples/begin-postgres.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://github.com/begin-examples/begin-postgres#readme",
+  "dependencies": {
+    "@architect/architect": "^8.5.10",
+    "@architect/functions": "^3.13.9",
+    "@architect/sandbox": "^3.4.2",
+    "ngrok": "^4.0.1",
+    "pg": "^8.6.0",
+    "ulid": "^2.3.0"
+  }
+}

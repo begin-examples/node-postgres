@@ -1,12 +1,68 @@
-name: PostgreSQL Service
-on: 
+name: PostgreSQL Tests
+on:
   push:
   workflow_dispatch:
 
 jobs:
-  runner-job:
+  postgres-tests:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+        # volumes:
+        #   - "scripts/seed-database.sql:/docker-entrypoint-initdb.d/init.sql"
+        #   #- ".github/workflows/seed-database.sql:/docker-entrypoint-initdb.d/init.sql"
+
     steps:
-      - run: echo 'this is a workflow'
-       
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Architect
+        run: npm i @architect/architect
+
+      - name: Install Test Dependencies
+        run: npm i tape tap-spec tiny-json-http @architect/sandbox
+
+      - name: Seed Postgres
+        run: node .github/workflows/seed-db.js
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DATABASE: postgres
+
+      - name: Run Sandbox Tests
+        run: QUIET=1 npx tape .github/workflows/postgres-custom-test.js | npx tap-spec
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DATABASE: postgres
+
+      - name: Notify
+        uses: homoluctus/slatify@master
+        if: github.ref == 'refs/heads/main' && failure()
+        with:
+          type: ${{ job.status }}
+          job_name: "*postgres custom test*"
+          url: ${{ secrets.BX_SLACK_WEBHOOK }}
+          commit: true
+          token: ${{ secrets.GITHUB_TOKEN }}
