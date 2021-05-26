@@ -1,7 +1,7 @@
 ---
 categories: database
 tags: postgres
-keywords: "relational database", SQL
+keywords:  SQL
 ---
 
 <img src="https://static.begin.app/node-hello-world/readme-banner.png" width="813">
