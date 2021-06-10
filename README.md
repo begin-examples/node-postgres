@@ -1,16 +1,5 @@
----
-categories: database
-tags: postgres
-keywords:  SQL
----
-
 <img src="https://static.begin.app/node-hello-world/readme-banner.png" width="813">
 
-<img src="https://img.shields.io/badge/Categories-database-blue?style=for-the-badge&logo=appveyor">
-<br>
-<img src="https://img.shields.io/badge/Tags-postgres-blue?style=for-the-badge&logo=appveyor">
-<br>
-<img src="https://img.shields.io/badge/Keywords-relational database, SQL-blue?style=for-the-badge&logo=appveyor">
 
 
 ## Deploy your own
