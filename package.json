@@ -1,24 +1,18 @@
 {
-  "name": "begin-postgres",
+  "name": "node-postgres",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "echo $TEST_ENV"
+    "start": "npx sandbox"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/begin-examples/begin-postgres.git"
-  },
-  "author": "",
+  "author": "Ryan Bethel",
   "license": "ISC",
-  "homepage": "https://github.com/begin-examples/begin-postgres#readme",
+  "devDependencies": {
+    "@architect/sandbox": "^3.4.2"
+  },
   "dependencies": {
-    "@architect/architect": "^8.5.10",
     "@architect/functions": "^3.13.9",
-    "@architect/sandbox": "^3.4.2",
-    "ngrok": "^4.0.1",
-    "pg": "^8.6.0",
-    "ulid": "^2.3.0"
+    "pg": "^8.6.0"
   }
 }

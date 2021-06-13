@@ -17,7 +17,7 @@ test('Request to Root', async (t) => {
   t.plan(1)
   try {
     const result = await tiny.get({ url: baseUrl })
-    t.ok(result.body.search('Octocat')!==-1, 'request to root responded')
+    t.ok(result.body.search('John Smith')!==-1, 'request to root responded')
   }
   catch (e) {
     t.fail('request to root failed')
