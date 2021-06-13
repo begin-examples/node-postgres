@@ -5,11 +5,11 @@ This example demonstrates a simple query to an externally hosted Postgres Databa
 - Copy `preferences.arc.example` to `preferences.arc`
 - Start the local dev server: `npm start`
 - To Deploy set environment variables for your Database in Begin
-  -  POSTGRES_DATABASE, POSTGRES_HOST, POSTGRES_PASSWORD , POSTGRES_PORT, POSTGRES_USER
+  - Set `DATABASE_URL`
   -  -OR-
-  - DATABASE_URL
+  - Set `POSTGRES_DATABASE`, `POSTGRES_HOST`, `POSTGRES_PASSWORD` , `POSTGRES_PORT`, and `POSTGRES_USER`
 
-## Limiting Connections
+## Managing Connections
 Postgres and most other relational databases have a limit to the number of open connections that can be made. Since your serverless application can scale up quickly it is possible overload the database. There are several approaches to managing this:
 1. Set a concurrency limit for any function in your app that may attempt to query the database. This can be done in the `config.arc` file in the `src` directory. 
 2. Use an external service to manage connections such as AWS RDS.
@@ -23,10 +23,6 @@ This example is set up to run a local version of Postgres using Docker Compose. 
 [![Deploy to Begin](https://static.begin.com/deploy-to-begin.svg)](https://begin.com/apps/create?template=https://github.com/begin-examples/node-postgres)
 
 Deploy your own clone of this app to Begin!
-
-## Getting started
-
--   Start the local dev server: `npm start`
 
 ## Reference
 

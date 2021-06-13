@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx sandbox"
+    "start": "npx sandbox",
+    "build": "[[! -z \"$DATABASE_URL\"]]"
   },
   "author": "Ryan Bethel",
   "license": "ISC",
