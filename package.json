@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npx sandbox",
-    "build": "[[! -z \"$DATABASE_URL\"]]"
+    "build": "[! -z \"$DATABASE_URL\"] || exit 1"
   },
   "author": "Ryan Bethel",
   "license": "ISC",
