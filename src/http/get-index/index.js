@@ -3,9 +3,9 @@ let config
 // full Database URI will be used first if supplied
 if (process.env.DB_URI) {
   config = {
-    connectionString: process.env.DB_URI
+    connectionString: process.env.DB_URI,
     // ssl property may be needed (i.e. Heroku)
-    //  ssl: { rejectUnauthorized: false },
+    ssl: { rejectUnauthorized: false },
   }
 } else {
   config = {
