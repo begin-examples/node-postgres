@@ -1,19 +1,19 @@
 let { Client } = require("pg");
 let config
 // full Database URI will be used first if supplied
-if (process.env.DATABASE_URL) {
+if (process.env.DB_URI) {
   config = {
-    connectionString: process.env.DATABASE_URL
+    connectionString: process.env.DB_URI
     // ssl property may be needed (i.e. Heroku)
     //  ssl: { rejectUnauthorized: false },
   }
 } else {
   config = {
-    host: process.env.POSTGRES_HOST,
-    user: process.env.POSTGRES_USER,
-    password: process.env.POSTGRES_PASSWORD,
-    database: process.env.POSTGRES_DATABASE,
-    port: process.env.POSTGRES_PORT,
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
     //  ssl: { rejectUnauthorized: false },
   }
 };
@@ -21,12 +21,12 @@ if (process.env.DATABASE_URL) {
 exports.handler = async function http() {
   let dbQuery;
   try {
-    console.time('postres query')
+    console.time('postgres query')
     let client = new Client(config);
     await client.connect();
     dbQuery = await client.query('SELECT * FROM student LIMIT 1;');
     await client.end();
-    console.timeEnd('postres query')
+    console.timeEnd('postgres query')
   } catch (e) {
     console.log(e);
   }

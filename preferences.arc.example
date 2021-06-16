@@ -1,13 +1,9 @@
-@sandbox-startup
-docker-compose -f ./scripts/docker-compose.yml up -d postgres 
-echo 'database started' 
-
 
 @env
 testing
-  POSTGRES_DATABASE postgres
-  POSTGRES_HOST localhost
-  POSTGRES_PASSWORD postgres
-  POSTGRES_PORT "5432"
-  POSTGRES_USER postgres
-  DATABASE_URL postgres://postgres:postgres@localhost:5432/postgres
+  DB_URI postgres://postgres:postgres@localhost:5432/postgres
+  DB_NAME postgres
+  DB_HOST localhost
+  DB_PASSWORD postgres
+  DB_PORT "5432"
+  DB_USER postgres
