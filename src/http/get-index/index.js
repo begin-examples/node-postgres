@@ -5,7 +5,7 @@ if (process.env.DB_URI) {
   config = {
     connectionString: process.env.DB_URI,
     // ssl property may be needed (i.e. Heroku)
-    ssl: { rejectUnauthorized: false },
+    // ssl: { rejectUnauthorized: false },
   }
 } else {
   config = {
