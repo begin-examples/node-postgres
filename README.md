@@ -17,9 +17,10 @@ For local testing point to a hosted testing database by setting environment vari
 ## Managing Connections
 Postgres and most other relational databases have a limit to the number of open connections they can support. Since your serverless application can scale up quickly it is possible overload those connections. There are several approaches to managing this:
 1. Set a concurrency limit for any function in your app that may attempt to query the database. This can be done in the `config.arc` file in the `src` directory for each endpoint. 
+2. Reuse connections speed up some queries. Lambda will reuse containers for functions if possible. Connections from that container can be used again for the next invocation. This technique is described by Jeremy Daly ([How To: Reuse Database Connections in AWS Lambda](https://www.jeremydaly.com/reuse-database-connections-aws-lambda/)).
 2. Use a service to manage connections such as [AWS RDS Proxy](https://aws.amazon.com/rds/proxy/).
-3. Host your own connection pooling server like `pg-bouncer`.
-4. Or try DynamoDB (available with Begin Data) that does not have this limitation.
+3. Host your own connection pooling server like [pg-bouncer](https://github.com/pgbouncer/pgbouncer).
+4. Or try DynamoDB (available on Begin through [Begin Data](https://docs.begin.com/en/data/begin-data)) that does not have this limitation.
 
 ## Reference
 
